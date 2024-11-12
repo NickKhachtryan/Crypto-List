@@ -13,6 +13,7 @@ class HomeController: UIViewController {
     //MARK: - PROPERTIES
     private let coins = Coin.getMockArray()
     
+    
     //MARK: - UI COMPONENTS
     private let tableView: UITableView = {
         let tableView = UITableView()
@@ -37,6 +38,7 @@ class HomeController: UIViewController {
     //MARK: - CONSTRAINTS
     
     private func setupUI() {
+        navigationItem.title = "CryptoList"
 //        view.backgroundColor = .green
 
         view.addSubview(tableView)
@@ -68,7 +70,10 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CoinCell.identifier, for: indexPath) as? CoinCell else { fatalError("error") }
         
         let coin = coins[indexPath.row]
-        cell.configure(with: coin)
+        
+        Task{
+            await cell.configure(with: coin)
+        }
         
         return cell
     }
@@ -78,7 +83,12 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
+        tableView.deselectRow(at: indexPath, animated: true)
+        let coin = coins[indexPath.row]
+        let vm = ViewCryptoControllerViewModel(coin)
+        let vc = ViewCryptoController(vm)
+        navigationController?.pushViewController(vc, animated: true)
+
     }
     
 }

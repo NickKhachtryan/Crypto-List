@@ -24,7 +24,6 @@ class CoinCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(systemName: "square.and.arrow.up.fill")
         imageView.tintColor = .black
-        imageView.backgroundColor = .brown
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -51,11 +50,25 @@ class CoinCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func configure(with coin: Coin) {
+    public func configure(with coin: Coin) async {
         self.coin = coin
         self.coinName.text = coin.name
+        
+        guard let url = self.coin.logoURL else { return }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            
+            await MainActor.run {
+                self.coinLogo.image = UIImage(data: data)
+            }
+        } catch {
+            print("Error loading image: \(error)")
+        }
     }
-    
+
+
+
+
     
     //MARK: - CONSTRAINTS
     

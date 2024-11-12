@@ -113,12 +113,9 @@ class ViewCryptoController: UIViewController {
         maxSupplyLabel.text = viewModel.maxSupplyLabel
         
         viewModel.onImageLoaded = { [weak self] logoImage in
-               Task {
-                   await MainActor.run {
-                       self?.coinLogo.image = logoImage
-                   }
-               }
-           }
+            self?.coinLogo.image = logoImage
+        }
+
        }
     
     //MARK: - UI SETUP

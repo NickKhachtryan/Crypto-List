@@ -71,10 +71,9 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
         
         let coin = coins[indexPath.row]
         
-        Task{
+        Task {
             await cell.configure(with: coin)
         }
-        
         return cell
     }
     

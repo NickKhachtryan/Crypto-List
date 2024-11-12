@@ -13,7 +13,7 @@ class CoinCell: UITableViewCell {
     //MARK: - PROPERTIES
     
     static let identifier = "CoinCell"
-
+    
     private(set) var coin: Coin!
     
     
@@ -50,25 +50,37 @@ class CoinCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func configure(with coin: Coin) async {
-        self.coin = coin
-        self.coinName.text = coin.name
+    private func fetchImage() async throws -> UIImage {
         
-        guard let url = self.coin.logoURL else { return }
+        guard let url = self.coin.logoURL else { throw URLError(.badURL) }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             
-            await MainActor.run {
-                self.coinLogo.image = UIImage(data: data)
-            }
+            guard let image = UIImage(data: data) else { throw URLError(.cannotDecodeContentData) }
+            return image
+            
         } catch {
-            print("Error loading image: \(error)")
+            throw error
         }
     }
-
-
-
-
+    
+    @MainActor public func configure(with coin: Coin) async {
+        
+        self.coin = coin
+        self.coinName.text = coin.name
+        
+        do {
+            self.coinLogo.image = try await fetchImage()
+        } catch {
+            print("error")
+            self.coinLogo.image = nil
+        }
+    }
+    
+    
+    
+    
+    
     
     //MARK: - CONSTRAINTS
     

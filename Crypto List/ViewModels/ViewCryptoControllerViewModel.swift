@@ -9,7 +9,7 @@ import UIKit
 
 class ViewCryptoControllerViewModel {
     
-    var onImageLoaded: ((UIImage?) -> Void)?
+    @MainActor var onImageLoaded: ((UIImage?) -> Void)?
 
     //MARK: - PROPERTIES
     let coin: Coin
@@ -23,21 +23,27 @@ class ViewCryptoControllerViewModel {
         }
     }
     
-    
-    private func loadImage() async {
-        guard let logoURL = self.coin.logoURL else { return }
-        
+    private func fetchImage() async throws -> UIImage {
+        guard let url = self.coin.logoURL else {
+            throw URLError(.badURL)
+        }
         do {
-            let (data, _) = try await URLSession.shared.data(from: logoURL)
+            let (data, _) = try await URLSession.shared.data(from: url)
             
-            if let logoImage = UIImage(data: data) {
-                
-                await MainActor.run {
-                    self.onImageLoaded?(logoImage)
-                }
-            }
+            guard let image = UIImage(data: data) else { throw URLError(.cannotDecodeContentData) }
+            return image
+            
         } catch {
-            print("Error loading image: \(error)")
+            throw error
+        }
+    }
+    
+    @MainActor private func loadImage() async {
+        do {
+            let logoImage = try await fetchImage()
+            self.onImageLoaded?(logoImage)
+        } catch {
+            print("error")
         }
     }
 

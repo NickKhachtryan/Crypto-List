@@ -1,3 +1,4 @@
+
 //
 //  ViewController.swift
 //  Crypto List
@@ -7,15 +8,12 @@
 
 import UIKit
 
-class HomeController: UIViewController {
+: UIViewController {
     
     
     //MARK: - PROPERTIES
-    private let coins: [Coin] = [
-        Coin(id: 1, name: "Bitcoin", maxSupply: 200, rank: 1, pricingData: Quote(USD: USD(price: 50000, market_cap: 1_000_000))),
-        Coin(id: 2, name: "Etherium", maxSupply: nil, rank: 2, pricingData: Quote(USD: USD(price: 2000, market_cap: 500_000))),
-        Coin(id: 3, name: "Monero", maxSupply: nil, rank: 3, pricingData: Quote(USD: USD(price: 200, market_cap: 250_000)))
-    ]
+    private let coins = Coin.getMockArray()
+    
     
     //MARK: - UI COMPONENTS
     private let tableView: UITableView = {
@@ -63,7 +61,7 @@ class HomeController: UIViewController {
 
 //MARK: - TABLEVIEW FUNCTIONS
 
-extension HomeController: UITableViewDelegate, UITableViewDataSource {
+extension HomeController2: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return coins.count
@@ -77,7 +75,6 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
         Task {
             await cell.configure(with: coin)
         }
-        
         return cell
     }
     

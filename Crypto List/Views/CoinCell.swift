@@ -55,8 +55,8 @@ class CoinCell: UITableViewCell {
         guard let url = self.coin.logoURL else { throw URLError(.badURL) }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            
             guard let image = UIImage(data: data) else { throw URLError(.cannotDecodeContentData) }
+            print("Cell Image Fetched", Thread.current)
             return image
             
         } catch {
@@ -70,11 +70,15 @@ class CoinCell: UITableViewCell {
         self.coinName.text = coin.name
         
         do {
-            self.coinLogo.image = try await fetchImage()
+            let coinLogo = try await fetchImage()
+            self.coinLogo.image = coinLogo
         } catch {
             print("error")
             self.coinLogo.image = nil
         }
+        
+        print("Cell Configured", Thread.current)
+        
     }
     
     
